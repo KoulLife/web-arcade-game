@@ -16,7 +16,9 @@ const backgroundLevel1 = new Sprite({
 })
 
 // Player 클래스 생성
-const player = new Player()
+const player = new Player({
+  collisionBlocks
+})
 
 const keys = {
   w: {
