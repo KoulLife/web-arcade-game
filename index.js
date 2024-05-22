@@ -12,12 +12,14 @@ const backgroundLevel1 = new Sprite({
     x: 0,
     y: 0,
   },
-  imageSrc: './img/backgroundLevel1.png'
+  imageSrc: './img/backgroundLevel1.png',
 })
 
 // Player 클래스 생성
 const player = new Player({
-  collisionBlocks
+  collisionBlocks,
+  imageSrc: './img/king/idle.png',
+  frameRate: 11
 })
 
 const keys = {
