@@ -1,5 +1,5 @@
 class Player{
-  constructor({collisionBlocks = [], imageSrc, frameRate = 1}) {
+  constructor({collisionBlocks = [], imageSrc, frameRate = 1, animations}) {
     this.position = {
       x: 200,
       y: 200,
@@ -27,7 +27,16 @@ class Player{
     this.currentFrame = 0
     this.elapsedFrames = 0
     this.frameBuffer = 2
+    this.animations = animations
+
+    if(this.animations){
+      for(let key in this.animations){
+        const image = new Image()
+        image.src = this.animations[key].imageSrc
+        this.animations[key].image = image
+      }
   }
+}
 
   draw(){
     // c.fillStyle = 'red'
@@ -74,6 +83,14 @@ class Player{
     this.applyGravity() // Apply gravity
     this.updateHitbox()
     this.checkForVerticalCollisions() // Check for vertical collisions
+  }
+
+  switchSprite(name) {
+    if (this.image === this.animations[name].image) return
+    this.currentFrame = 0
+    this.image = this.animations[name].image
+    this.frameRate = this.animations[name].frameRate
+    this.frameBuffer = this.animations[name].frameBuffer
   }
 
   updateHitbox(){
