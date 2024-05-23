@@ -1,5 +1,5 @@
 class Player{
-  constructor({collisionBlocks = [], imageSrc, frameRate = 1, animations}) {
+  constructor({collisionBlocks = [], imageSrc, frameRate = 1, animations, loop = true}) {
     this.position = {
       x: 200,
       y: 200,
@@ -11,6 +11,7 @@ class Player{
       x: 0,
       y: 0,
     }
+    this.loop = loop
     this.gravity = 1
     this.collisionBlocks = collisionBlocks
 
@@ -85,12 +86,31 @@ class Player{
     this.checkForVerticalCollisions() // Check for vertical collisions
   }
 
+  handleInput(keys){
+    if (this.preventInput) return
+    this.velocity.x = 0
+    if(keys.d.pressed) {
+      this.switchSprite('runRight')
+      this.velocity.x = 5
+      this.lastDirections = 'right'
+    } else if(keys.a.pressed) {
+      this.switchSprite('runLeft')
+      this.velocity.x = -5
+      this.lastDirections = 'left'
+    }
+    else {
+      if (this.lastDirections === 'left') player.switchSprite('idleLeft')
+      else this.switchSprite('idleRight')
+    }
+  }
+
   switchSprite(name) {
     if (this.image === this.animations[name].image) return
     this.currentFrame = 0
     this.image = this.animations[name].image
     this.frameRate = this.animations[name].frameRate
     this.frameBuffer = this.animations[name].frameBuffer
+    this.loop = this.animations[name].loop
   }
 
   updateHitbox(){
