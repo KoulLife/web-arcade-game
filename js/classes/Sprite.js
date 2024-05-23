@@ -64,34 +64,25 @@ class Sprite {
     this.autoplay = true
   }
 
-  updateFrames(){
+
+  updateFrames() {
     if (!this.autoplay) return
 
     this.elapsedFrames++
 
-    if(this.elapsedFrames % this.frameBuffer === 0){
-      if(this.currentFrame < this.frameRate - 1) this.currentFrame++
+    if (this.elapsedFrames % this.frameBuffer === 0) {
+      if (this.currentFrame < this.frameRate - 1) this.currentFrame++
       else if (this.loop) this.currentFrame = 0
     }
+
+    if (this.currentAnimation?.onComplete) {
+      if (
+        this.currentFrame === this.frameRate - 1 &&
+        !this.currentAnimation.isActive
+      ) {
+        this.currentAnimation.onComplete()
+        this.currentAnimation.isActive = true
+      }
+    }
   }
-  // updateFrames() {
-  //   if (!this.autoplay) return
-  //
-  //   this.elapsedFrames++
-  //
-  //   if (this.elapsedFrames % this.frameBuffer === 0) {
-  //     if (this.currentFrame < this.frameRate - 1) this.currentFrame++
-  //     else if (this.loop) this.currentFrame = 0
-  //   }
-  //
-  //   if (this.currentAnimation?.onComplete) {
-  //     if (
-  //       this.currentFrame === this.frameRate - 1 &&
-  //       !this.currentAnimation.isActive
-  //     ) {
-  //       this.currentAnimation.onComplete()
-  //       this.currentAnimation.isActive = true
-  //     }
-  //   }
-  // }
 }

@@ -1,5 +1,12 @@
 class Player{
-  constructor({collisionBlocks = [], imageSrc, frameRate = 1, animations, loop = true}) {
+  constructor({collisionBlocks = [],
+                imageSrc,
+                frameRate = 1,
+                animations,
+                frameBuffer = 2,
+                loop = true,
+                autoplay = true,
+  }) {
     this.position = {
       x: 200,
       y: 200,
@@ -11,7 +18,6 @@ class Player{
       x: 0,
       y: 0,
     }
-    this.loop = loop
     this.gravity = 1
     this.collisionBlocks = collisionBlocks
 
@@ -27,16 +33,19 @@ class Player{
     this.frameRate = frameRate
     this.currentFrame = 0
     this.elapsedFrames = 0
-    this.frameBuffer = 2
+    this.frameBuffer = frameBuffer
     this.animations = animations
+    this.loop = loop
+    this.autoplay = autoplay
+    this.currentAnimation
 
-    if(this.animations){
-      for(let key in this.animations){
+    if (this.animations) {
+      for (let key in this.animations) {
         const image = new Image()
         image.src = this.animations[key].imageSrc
         this.animations[key].image = image
       }
-  }
+    }
 }
 
   draw(){
@@ -67,13 +76,29 @@ class Player{
     this.updateFrames()
   }
 
-  updateFrames(){
+  updateFrames() {
+    if (!this.autoplay) return
+
     this.elapsedFrames++
 
-    if (this.elapsedFrames % this.frameBuffer === 0){
+    if (this.elapsedFrames % this.frameBuffer === 0) {
       if (this.currentFrame < this.frameRate - 1) this.currentFrame++
-      else this.currentFrame = 0
+      else if (this.loop) this.currentFrame = 0
     }
+
+    if (this.currentAnimation?.onComplete) {
+      if (
+        this.currentFrame === this.frameRate - 1 &&
+        !this.currentAnimation.isActive
+      ) {
+        this.currentAnimation.onComplete()
+        this.currentAnimation.isActive = true
+      }
+    }
+  }
+
+  play() {
+    this.autoplay = true
   }
 
   update(){
@@ -86,20 +111,19 @@ class Player{
     this.checkForVerticalCollisions() // Check for vertical collisions
   }
 
-  handleInput(keys){
+  handleInput(keys) {
     if (this.preventInput) return
     this.velocity.x = 0
-    if(keys.d.pressed) {
+    if (keys.d.pressed) {
       this.switchSprite('runRight')
       this.velocity.x = 5
-      this.lastDirections = 'right'
-    } else if(keys.a.pressed) {
+      this.lastDirection = 'right'
+    } else if (keys.a.pressed) {
       this.switchSprite('runLeft')
       this.velocity.x = -5
-      this.lastDirections = 'left'
-    }
-    else {
-      if (this.lastDirections === 'left') player.switchSprite('idleLeft')
+      this.lastDirection = 'left'
+    } else {
+      if (this.lastDirection === 'left') this.switchSprite('idleLeft')
       else this.switchSprite('idleRight')
     }
   }
@@ -110,6 +134,7 @@ class Player{
     this.image = this.animations[name].image
     this.frameRate = this.animations[name].frameRate
     this.frameBuffer = this.animations[name].frameBuffer
+    this.currentAnimation = this.animations[name]
     this.loop = this.animations[name].loop
   }
 
